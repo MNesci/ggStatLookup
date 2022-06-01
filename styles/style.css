@@ -112,6 +112,25 @@ main {
 
 
 /*
+Encounter Section Layout
+*/
+
+.encounterSection {
+    margin-bottom: 20px;
+}
+
+.encounterDropdownsSection {
+    display: flex;
+    gap: 10px;
+}
+
+.encounterDropdownsSection h3,
+.threatButton {
+    padding: 5px;
+}
+
+
+/*
 Add Enemy Button Layout
 */
 
@@ -164,6 +183,14 @@ Enemy Stat Section Layout
 }
 
 
+
+/*
+Encounter Section Style
+*/
+
+.encounterSection * {
+    font-size: 1.5rem;
+}
 
 
 /*
