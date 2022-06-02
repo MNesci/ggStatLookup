@@ -345,11 +345,14 @@ class baseStats {
 
 };
 
-const baseStatsTable = new baseStats();
 
+// creates enemy objects that calculate appropriate stats
 class Enemy {
 
-    constructor(enemyLevel) {
+    constructor(enemyLevel, enemyRank, enemyRole) {
+        this.enemyLevel = enemyLevel;
+        this.enemyRank = enemyRank;
+        this.enemyRole = enemyRole;
         this.abilityMods = baseStatsTable[enemyLevel].abilityMods;
         this.proficiencyBonus = baseStatsTable[enemyLevel].proficiencyBonus;
         this.initiavtive = baseStatsTable[enemyLevel].initiavtive;
@@ -436,8 +439,8 @@ class Enemy {
 
 class Minion extends Enemy {
 
-    constructor(enemyLevel) {
-        super(enemyLevel);
+    constructor(enemyLevel, enemyRank, enemyRole) {
+        super(enemyLevel, enemyRank, enemyRole);
         let threatMultiplier = 0.25;
         let rankHitPointMultiplier = 0.2;
         let rankTrainedSavingThrowAdjustment = -1;
@@ -457,8 +460,8 @@ class Minion extends Enemy {
 
 class Grunt extends Enemy {
 
-    constructor(enemyLevel) {
-        super(enemyLevel);
+    constructor(enemyLevel, enemyRank, enemyRole) {
+        super(enemyLevel, enemyRank, enemyRole);
         let baseFeatures = '3 - 8';
         this.baseFeatures = baseFeatures;
     };
@@ -466,8 +469,8 @@ class Grunt extends Enemy {
 
 class Elite extends Enemy {
 
-    constructor(enemyLevel) {
-        super(enemyLevel);
+    constructor(enemyLevel, enemyRank, enemyRole) {
+        super(enemyLevel, enemyRank, enemyRole);
         let threatMultiplier = 2;
         let rankHitPointMultiplier = 2;
         let rankInitiativeAdjustment = this.proficiencyBonus/2;
@@ -495,8 +498,8 @@ class Elite extends Enemy {
 
 class Paragon extends Enemy {
 
-    constructor(enemyLevel, threatMultiplier) {
-        super(enemyLevel);
+    constructor(enemyLevel, enemyRank, enemyRole, threatMultiplier) {
+        super(enemyLevel, enemyRank, enemyRole);
         let rankHitPointMultiplier = threatMultiplier;
         let rankInitiativeAdjustment = this.proficiencyBonus;
         let rankArmorClassAdjustment = 2;
@@ -521,12 +524,40 @@ class Paragon extends Enemy {
     };
 };
 
+// creates encounter objects that will hold current enemies
+class Encounter {
+    constructor() {
+        this.enemies = [];
+    };
 
-// NEED TO EXTEND CLASS FOR ROLES
+    calculateDifficulty() {
+        // iterate over this.enemies, calculate relative threat for each, and display to encounter DOM
+        alert('Difficulty calculated?');
+    };
 
+    // adds a placeholder object to encounter when dropdowns are added
+    addPlaceholder() {
+        this.enemies.push({enemyName: 'placeholder', enemyLevel: 0, threat: 0,});
+    };
+
+    // removes a placeholder or enemy object from encounter when delete is used
+    removeEnemy(indexOfEnemy) {
+        this.enemies.splice(indexOfEnemy, 1);
+        this.calculateDifficulty();
+    };
+
+    // removes placeholder or enemy object from encounter, and inserts enemy when generate is used
+    updateEnemy(indexOfEnemy, enemy) {
+        this.enemies.splice(indexOfEnemy, 1, enemy);
+        this.calculateDifficulty();
+    }
+
+};
 
 // function to add a new set of enemy dropdowns
 function addAnEnemy() {
+    // add a placeholder enemy to the encounter object
+    encounter.addPlaceholder();
     // create a section for the enemy
     let newEnemy = document.createElement('section');
     // give the section the corresponding class
@@ -543,7 +574,17 @@ function addAnEnemy() {
     // give the button the corresponding class
     deleteButton.className = 'deleteEnemyButton';
     // add event listener to delete enemy when clicked
-    deleteButton.addEventListener('click', (click) => click.target.parentElement.parentElement.remove())
+    deleteButton.addEventListener('click', function(click) {
+        // remove the enemy from the encounter object
+        // assign a variable to the enemy's section
+        let thisEnemySection = click.target.parentElement.parentElement;
+        // calculate the index of the corresponding enemy in the encounter object (subtract 1 due to Add Enemy button)
+        let indexOfThisEnemy = Array.from(thisEnemySection.parentElement.children).indexOf(thisEnemySection) - 1;
+        // remove the enemy from the encounter object
+        encounter.removeEnemy(indexOfThisEnemy);
+        // delete the entire enemy section
+        thisEnemySection.remove();
+    });
     // append the button into the enemy
     newEnemyMenu.appendChild(deleteButton);
 
@@ -615,19 +656,19 @@ function addAnEnemy() {
         let enemy;
         // execute the appropriate constructor
         if (enemyRank === 'Minion') {
-            enemy = new Minion(enemyLevel);
+            enemy = new Minion(enemyLevel, enemyRank, enemyRole);
         } else if (enemyRank === 'Grunt') {
-            enemy = new Grunt(enemyLevel);
+            enemy = new Grunt(enemyLevel, enemyRank, enemyRole);
         } else if (enemyRank === 'Elite') {
-            enemy = new Elite(enemyLevel);
+            enemy = new Elite(enemyLevel, enemyRank, enemyRole);
         } else if (enemyRank === 'Paragon (3)') {
-            enemy = new Paragon(enemyLevel, 3);
+            enemy = new Paragon(enemyLevel, enemyRank, enemyRole, 3);
         } else if (enemyRank === 'Paragon (4)') {
-            enemy = new Paragon(enemyLevel, 4);
+            enemy = new Paragon(enemyLevel, enemyRank, enemyRole, 4);
         } else if (enemyRank === 'Paragon (5)') {
-            enemy = new Paragon(enemyLevel, 5);
+            enemy = new Paragon(enemyLevel, enemyRank, enemyRole, 5);
         } else if (enemyRank === 'Paragon (6)') {
-            enemy = new Paragon(enemyLevel, 6);
+            enemy = new Paragon(enemyLevel, enemyRank, enemyRole, 6);
         };
         // execute the appropriate role method
         if (enemyRole === 'Controller') {
@@ -643,6 +684,14 @@ function addAnEnemy() {
         } else if (enemyRole === 'Supporter') {
             enemy.becomeSupporter();
         };
+
+        // update the enemy's stats in the encounter object
+        // assign a variable to the enemy's section
+        let thisEnemySection = click.target.parentElement.parentElement;
+        // calculate the index of the corresponding enemy in the encounter object (subtract 1 due to Add Enemy button)
+        let indexOfThisEnemy = Array.from(thisEnemySection.parentElement.children).indexOf(thisEnemySection) - 1;
+        // update the enemy in the encounter object
+        encounter.updateEnemy(indexOfThisEnemy, enemy);
 
         // make a section for the enemy
         let enemyStatSection = document.createElement('section');
@@ -710,7 +759,30 @@ function addAnEnemy() {
 
     // append the enemy section into the enemies section
     document.querySelector('.statGenerationSection').appendChild(newEnemy);
-}
+};
 
 // addAnEnemy() when button is clicked
 document.querySelector('.addEnemyButton').addEventListener('click', addAnEnemy);
+
+
+
+// create base stats object used by enemy constructors
+const baseStatsTable = new baseStats();
+
+// create encounter object to hold current enemies
+let encounter = new Encounter();
+
+
+// example code on how to use encounter object
+/*
+let enemy = {
+    enemyName: 'bad guy',
+    enemyHP: 40,
+};
+
+let zero = document.querySelector('.zero');
+zero.addEventListener('click', function(click) {
+    encounter.addEnemy(enemy);
+    console.log(encounter.enemies);
+});
+*/
