@@ -124,6 +124,17 @@ Encounter Section Layout
     gap: 10px;
 }
 
+.dropdownContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.threatBudgetSpan,
+.threatSpentSpan {
+    align-self: center;
+}
+
 .encounterDropdownsSection h3,
 .threatButton {
     padding: 5px;

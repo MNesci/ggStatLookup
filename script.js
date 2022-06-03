@@ -530,9 +530,56 @@ class Encounter {
         this.enemies = [];
     };
 
-    calculateDifficulty() {
-        // iterate over this.enemies, calculate relative threat for each, and display to encounter DOM
-        alert('Difficulty calculated?');
+    calculateThreatBudget() {
+        // assign a variable for the selected number of PCs
+        this.numberOfPCs = document.querySelector('.numberOfPCsDropdown').value;
+        // assign a variable for the encounter difficulty
+        this.encounterDifficulty = document.querySelector('.encounterDifficultyDropdown').value;
+        // determine the encounter threat budget
+        switch(this.encounterDifficulty) {
+            case 'Trivial' :
+                this.encounterThreatBudget = this.numberOfPCs * 0.25;
+                break;
+            case 'Easy' :
+                this.encounterThreatBudget = this.numberOfPCs * 0.5;
+                break;
+            case 'Normal' :
+                this.encounterThreatBudget = this.numberOfPCs;
+                break;
+            case 'Hard' :
+                this.encounterThreatBudget = this.numberOfPCs * 1.5;
+                break;
+            case 'Extreme' :
+                this.encounterThreatBudget = this.numberOfPCs * 2;
+                break;
+        };
+        // display the threat budget in the DOM
+        document.querySelector('.threatBudgetSpan').innerHTML = this.encounterThreatBudget;
+    };
+
+    calculateThreatSpent() {
+        // assign a variable for the selected average PC level
+        this.averagePCLevel = document.querySelector('.averagePCLevelDropdown').value;
+        // iterate over this.enemies, determining the relative threat for each
+        let relativeThreatArray = this.enemies.map(function(enemy) {
+            console.log(enemy.enemyLevel);
+            // compare the enemy's level to the average PC level
+            if ((encounter.averagePCLevel - 6) >= enemy.enemyLevel) {
+                return enemy.threat * 0.25;
+            } else if ((encounter.averagePCLevel - 3) >= enemy.enemyLevel) {
+                return enemy.threat * 0.5;
+            } else if ((enemy.enemyLevel - 6) >= encounter.averagePCLevel) {
+                return enemy.threat * 4;
+            } else if ((enemy.enemyLevel - 3) >= encounter.averagePCLevel) {
+                return enemy.threat * 2;
+            } else {
+                return enemy.threat;
+            };
+        });
+        // sum the relative threats
+        let threatSpent = relativeThreatArray.reduce((sum, relativeThreat) => sum + relativeThreat, 0);
+        // display the threat spent in the DOM
+        document.querySelector('.threatSpentSpan').innerHTML = threatSpent;
     };
 
     // adds a placeholder object to encounter when dropdowns are added
@@ -543,13 +590,13 @@ class Encounter {
     // removes a placeholder or enemy object from encounter when delete is used
     removeEnemy(indexOfEnemy) {
         this.enemies.splice(indexOfEnemy, 1);
-        this.calculateDifficulty();
+        this.calculateThreatSpent();
     };
 
     // removes placeholder or enemy object from encounter, and inserts enemy when generate is used
     updateEnemy(indexOfEnemy, enemy) {
         this.enemies.splice(indexOfEnemy, 1, enemy);
-        this.calculateDifficulty();
+        this.calculateThreatSpent();
     }
 
 };
@@ -772,17 +819,5 @@ const baseStatsTable = new baseStats();
 // create encounter object to hold current enemies
 let encounter = new Encounter();
 
-
-// example code on how to use encounter object
-/*
-let enemy = {
-    enemyName: 'bad guy',
-    enemyHP: 40,
-};
-
-let zero = document.querySelector('.zero');
-zero.addEventListener('click', function(click) {
-    encounter.addEnemy(enemy);
-    console.log(encounter.enemies);
-});
-*/
+// add event listener to Calculate Threat Budget Button
+document.querySelector('.threatButton').addEventListener('click', encounter.calculateThreatBudget);
