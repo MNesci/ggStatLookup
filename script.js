@@ -349,10 +349,27 @@ class baseStats {
 // creates enemy objects that calculate appropriate stats
 class Enemy {
 
-    constructor(enemyLevel, enemyRank, enemyRole) {
-        this.enemyLevel = enemyLevel;
-        this.enemyRank = enemyRank;
-        this.enemyRole = enemyRole;
+    constructor(enemyLevel, enemyRank, enemyRole, enemyQuantity) {
+        // dropdown properties aren't enumerable so they aren't displayed again in the DOM
+        Object.defineProperties(this, {
+            enemyLevel: {
+                value: enemyLevel,
+                enumerable: false,
+            },
+            enemyRank: {
+                value: enemyRank,
+                enumerable: false,
+            },
+            enemyRole: {
+                value: enemyRole,
+                enumerable: false,
+            },
+            enemyQuantity: {
+                value: enemyQuantity,
+                enumberable: false,
+            },
+        });
+
         this.abilityMods = baseStatsTable[enemyLevel].abilityMods;
         this.proficiencyBonus = baseStatsTable[enemyLevel].proficiencyBonus;
         this.initiavtive = baseStatsTable[enemyLevel].initiavtive;
@@ -439,8 +456,8 @@ class Enemy {
 
 class Minion extends Enemy {
 
-    constructor(enemyLevel, enemyRank, enemyRole) {
-        super(enemyLevel, enemyRank, enemyRole);
+    constructor(enemyLevel, enemyRank, enemyRole, enemyQuantity) {
+        super(enemyLevel, enemyRank, enemyRole, enemyQuantity);
         let threatMultiplier = 0.25;
         let rankHitPointMultiplier = 0.2;
         let rankTrainedSavingThrowAdjustment = -1;
@@ -460,8 +477,8 @@ class Minion extends Enemy {
 
 class Grunt extends Enemy {
 
-    constructor(enemyLevel, enemyRank, enemyRole) {
-        super(enemyLevel, enemyRank, enemyRole);
+    constructor(enemyLevel, enemyRank, enemyRole, enemyQuantity) {
+        super(enemyLevel, enemyRank, enemyRole, enemyQuantity);
         let baseFeatures = '3 - 8';
         this.baseFeatures = baseFeatures;
     };
@@ -469,8 +486,8 @@ class Grunt extends Enemy {
 
 class Elite extends Enemy {
 
-    constructor(enemyLevel, enemyRank, enemyRole) {
-        super(enemyLevel, enemyRank, enemyRole);
+    constructor(enemyLevel, enemyRank, enemyRole, enemyQuantity) {
+        super(enemyLevel, enemyRank, enemyRole, enemyQuantity);
         let threatMultiplier = 2;
         let rankHitPointMultiplier = 2;
         let rankInitiativeAdjustment = this.proficiencyBonus/2;
@@ -498,8 +515,8 @@ class Elite extends Enemy {
 
 class Paragon extends Enemy {
 
-    constructor(enemyLevel, enemyRank, enemyRole, threatMultiplier) {
-        super(enemyLevel, enemyRank, enemyRole);
+    constructor(enemyLevel, enemyRank, enemyRole, enemyQuantity, threatMultiplier) {
+        super(enemyLevel, enemyRank, enemyRole, enemyQuantity);
         let rankHitPointMultiplier = threatMultiplier;
         let rankInitiativeAdjustment = this.proficiencyBonus;
         let rankArmorClassAdjustment = 2;
@@ -530,6 +547,7 @@ class Encounter {
         this.enemies = [];
     };
 
+    // calculate how much "threat" the encounter should be worth
     calculateThreatBudget() {
         // assign a variable for the selected number of PCs
         this.numberOfPCs = document.querySelector('.numberOfPCsDropdown').value;
@@ -557,23 +575,23 @@ class Encounter {
         document.querySelector('.threatBudgetSpan').innerHTML = this.encounterThreatBudget;
     };
 
+    // calculate how much "threat" has been spent on the current enemies
     calculateThreatSpent() {
         // assign a variable for the selected average PC level
         this.averagePCLevel = document.querySelector('.averagePCLevelDropdown').value;
         // iterate over this.enemies, determining the relative threat for each
         let relativeThreatArray = this.enemies.map(function(enemy) {
-            console.log(enemy.enemyLevel);
             // compare the enemy's level to the average PC level
             if ((encounter.averagePCLevel - 6) >= enemy.enemyLevel) {
-                return enemy.threat * 0.25;
+                return enemy.threat * enemy.enemyQuantity * 0.25;
             } else if ((encounter.averagePCLevel - 3) >= enemy.enemyLevel) {
-                return enemy.threat * 0.5;
+                return enemy.threat * enemy.enemyQuantity * 0.5;
             } else if ((enemy.enemyLevel - 6) >= encounter.averagePCLevel) {
-                return enemy.threat * 4;
+                return enemy.threat * enemy.enemyQuantity * 4;
             } else if ((enemy.enemyLevel - 3) >= encounter.averagePCLevel) {
-                return enemy.threat * 2;
+                return enemy.threat * enemy.enemyQuantity * 2;
             } else {
-                return enemy.threat;
+                return enemy.threat * enemy.enemyQuantity;
             };
         });
         // sum the relative threats
@@ -642,7 +660,7 @@ function addAnEnemy() {
     // create and append the corresponding options into the dropdown
     for (let i = 0; i <= 25; i++) {
         let levelOption = document.createElement('option');
-        levelOption.innerText = i;
+        levelOption.innerText = `Level ${i}`;
         levelLookup.appendChild(levelOption);
     };
 
@@ -670,6 +688,17 @@ function addAnEnemy() {
         roleLookup.appendChild(newRole);
     };
 
+    // create a quantity dropdown
+    let quantityLookup = document.createElement('select');
+    // append the quantity dropdown into the enemy dropdown section
+    newEnemyMenu.appendChild(quantityLookup);
+    // create and append the corresponding options into the dropdown
+    for (let i = 1; i <= 16; i++) {
+        let quantityOption = document.createElement('option');
+        quantityOption.innerText = `Quantity: ${i}`;
+        quantityLookup.appendChild(quantityOption);
+    };
+
     // create a button to generate stats
     let statGenerationButton = document.createElement('button');
     statGenerationButton.innerText = 'Generate/Update Stats';
@@ -693,29 +722,31 @@ function addAnEnemy() {
         // create an array of the 3 dropdowns for the enemy
         let dropdownArray = Array.from(click.target.parentElement.children).filter((node) => node.localName === 'select');
         // assign a variable for the enemy's level
-        let enemyLevel = dropdownArray[0].value;
+        let enemyLevel = Number(dropdownArray[0].value.replace('Level ', ''));
         // assign a variable for the enemy's rank
         let enemyRank = dropdownArray[1].value;
         // assign a variable for the enemy's role
         let enemyRole = dropdownArray[2].value;
+        // assign a variable for the enemy's quantity
+        let enemyQuantity = Number(dropdownArray[3].value.replace('Quantity: ', ''));
 
         // declare a variable for the enemy object that will be made
         let enemy;
         // execute the appropriate constructor
         if (enemyRank === 'Minion') {
-            enemy = new Minion(enemyLevel, enemyRank, enemyRole);
+            enemy = new Minion(enemyLevel, enemyRank, enemyRole, enemyQuantity);
         } else if (enemyRank === 'Grunt') {
-            enemy = new Grunt(enemyLevel, enemyRank, enemyRole);
+            enemy = new Grunt(enemyLevel, enemyRank, enemyRole, enemyQuantity);
         } else if (enemyRank === 'Elite') {
-            enemy = new Elite(enemyLevel, enemyRank, enemyRole);
+            enemy = new Elite(enemyLevel, enemyRank, enemyRole, enemyQuantity);
         } else if (enemyRank === 'Paragon (3)') {
-            enemy = new Paragon(enemyLevel, enemyRank, enemyRole, 3);
+            enemy = new Paragon(enemyLevel, enemyRank, enemyRole, enemyQuantity, 3);
         } else if (enemyRank === 'Paragon (4)') {
-            enemy = new Paragon(enemyLevel, enemyRank, enemyRole, 4);
+            enemy = new Paragon(enemyLevel, enemyRank, enemyRole, enemyQuantity, 4);
         } else if (enemyRank === 'Paragon (5)') {
-            enemy = new Paragon(enemyLevel, enemyRank, enemyRole, 5);
+            enemy = new Paragon(enemyLevel, enemyRank, enemyRole, enemyQuantity, 5);
         } else if (enemyRank === 'Paragon (6)') {
-            enemy = new Paragon(enemyLevel, enemyRank, enemyRole, 6);
+            enemy = new Paragon(enemyLevel, enemyRank, enemyRole, enemyQuantity, 6);
         };
         // execute the appropriate role method
         if (enemyRole === 'Controller') {
@@ -817,7 +848,7 @@ document.querySelector('.addEnemyButton').addEventListener('click', addAnEnemy);
 const baseStatsTable = new baseStats();
 
 // create encounter object to hold current enemies
-let encounter = new Encounter();
+const encounter = new Encounter();
 
 // add event listener to Calculate Threat Budget Button
 document.querySelector('.threatButton').addEventListener('click', encounter.calculateThreatBudget);
