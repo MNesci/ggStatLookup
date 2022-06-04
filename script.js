@@ -615,112 +615,23 @@ class Encounter {
     updateEnemy(indexOfEnemy, enemy) {
         this.enemies.splice(indexOfEnemy, 1, enemy);
         this.calculateThreatSpent();
-    }
-
-};
-
-// function to add a new set of enemy dropdowns
-function addAnEnemy() {
-    // add a placeholder enemy to the encounter object
-    encounter.addPlaceholder();
-    // create a section for the enemy
-    let newEnemy = document.createElement('section');
-    // give the section the corresponding class
-    newEnemy.className = 'individualEnemySection';
-
-    // create a section for the enemy lookup dropdowns and buttons
-    let newEnemyMenu = document.createElement('section');
-    // give the section the corresponding class
-    newEnemyMenu.className = 'enemyLookupSection';
-
-    // create a delete button
-    let deleteButton = document.createElement('button');
-    deleteButton.innerText = 'Delete Enemy';
-    // give the button the corresponding class
-    deleteButton.className = 'deleteEnemyButton';
-    // add event listener to delete enemy when clicked
-    deleteButton.addEventListener('click', function(click) {
-        // remove the enemy from the encounter object
-        // assign a variable to the enemy's section
-        let thisEnemySection = click.target.parentElement.parentElement;
-        // calculate the index of the corresponding enemy in the encounter object (subtract 1 due to Add Enemy button)
-        let indexOfThisEnemy = Array.from(thisEnemySection.parentElement.children).indexOf(thisEnemySection) - 1;
-        // remove the enemy from the encounter object
-        encounter.removeEnemy(indexOfThisEnemy);
-        // delete the entire enemy section
-        thisEnemySection.remove();
-    });
-    // append the button into the enemy
-    newEnemyMenu.appendChild(deleteButton);
-
-    // create a level dropdown
-    let levelLookup = document.createElement('select');
-    // append the level dropdown into the enemy dropdown section
-    newEnemyMenu.appendChild(levelLookup);
-    // create and append the corresponding options into the dropdown
-    for (let i = 0; i <= 25; i++) {
-        let levelOption = document.createElement('option');
-        levelOption.innerText = `Level ${i}`;
-        levelLookup.appendChild(levelOption);
     };
 
-    // create a rank dropdown
-    let rankLookup = document.createElement('select');
-    // append the rank dropdown into the enemy dropdown section
-    newEnemyMenu.appendChild(rankLookup);
-    // create and append the corresponding options into the dropdown
-    let rankList = ['Minion', 'Grunt', 'Elite', 'Paragon (3)', 'Paragon (4)', 'Paragon (5)', 'Paragon (6)'];
-    for (let rank of rankList) {
-        let newRank = document.createElement('option');
-        newRank.innerText = rank;
-        rankLookup.appendChild(newRank);
-    };
-
-    // create a role dropdown
-    let roleLookup = document.createElement('select');
-    // append the role dropdown into the enemy dropdown section
-    newEnemyMenu.appendChild(roleLookup);
-    // create and append the corresponding options into the dropdown
-    let roleList = ['Controller', 'Defender', 'Lurker', 'Skirmisher', 'Striker', 'Supporter'];
-    for (let role of roleList) {
-        let newRole = document.createElement('option');
-        newRole.innerText = role;
-        roleLookup.appendChild(newRole);
-    };
-
-    // create a quantity dropdown
-    let quantityLookup = document.createElement('select');
-    // append the quantity dropdown into the enemy dropdown section
-    newEnemyMenu.appendChild(quantityLookup);
-    // create and append the corresponding options into the dropdown
-    for (let i = 1; i <= 16; i++) {
-        let quantityOption = document.createElement('option');
-        quantityOption.innerText = `Quantity: ${i}`;
-        quantityLookup.appendChild(quantityOption);
-    };
-
-    // create a button to generate stats
-    let statGenerationButton = document.createElement('button');
-    statGenerationButton.innerText = 'Generate/Update Stats';
-    // add the corresponding class
-    statGenerationButton.className = 'statGenerationButton';
-
-    // add event listener to generate stats when clicked
-    statGenerationButton.addEventListener('click', (click) => {
+    updateAndAppendStats(event) {
         // assign variables to determine if an enemy's name is saved, and what its text is
         let enemyNameSaved;
         let enemyNameText;
         // check if the enemy has already been generated
-        if (click.target.parentElement.parentElement.children.length > 1) {
+        if (event.target.parentElement.parentElement.children.length > 1) {
             // save the enemy's name
-            enemyNameText = click.target.parentElement.parentElement.children[1].children[0].children[1].value;
+            enemyNameText = event.target.parentElement.parentElement.children[1].children[0].children[1].value;
             enemyNameSaved = true;
             // delete its stat section before generating a new one
-            click.target.parentElement.parentElement.children[1].remove();
+            event.target.parentElement.parentElement.children[1].remove();
         };
 
         // create an array of the 3 dropdowns for the enemy
-        let dropdownArray = Array.from(click.target.parentElement.children).filter((node) => node.localName === 'select');
+        let dropdownArray = Array.from(event.target.parentElement.children).filter((node) => node.localName === 'select');
         // assign a variable for the enemy's level
         let enemyLevel = Number(dropdownArray[0].value.replace('Level ', ''));
         // assign a variable for the enemy's rank
@@ -765,7 +676,7 @@ function addAnEnemy() {
 
         // update the enemy's stats in the encounter object
         // assign a variable to the enemy's section
-        let thisEnemySection = click.target.parentElement.parentElement;
+        let thisEnemySection = event.target.parentElement.parentElement;
         // calculate the index of the corresponding enemy in the encounter object (subtract 1 due to Add Enemy button)
         let indexOfThisEnemy = Array.from(thisEnemySection.parentElement.children).indexOf(thisEnemySection) - 1;
         // update the enemy in the encounter object
@@ -825,24 +736,110 @@ function addAnEnemy() {
             enemyStatSection.appendChild(individualStatSection);
         };
         // append the section to the parent section of the generate stats button
-        click.target.parentElement.parentElement.appendChild(enemyStatSection);
+        event.target.parentElement.parentElement.appendChild(enemyStatSection);
+    };
+};
 
+// function to add a new set of enemy dropdowns
+function addAnEnemy() {
+    // add a placeholder enemy to the encounter object
+    encounter.addPlaceholder();
+    // create a section for the enemy
+    let newEnemy = document.createElement('section');
+    // give the section the corresponding class
+    newEnemy.className = 'individualEnemySection';
+
+    // create a section for the enemy lookup dropdowns and buttons
+    let newEnemyMenu = document.createElement('section');
+    // give the section the corresponding class
+    newEnemyMenu.className = 'enemyLookupSection';
+
+    // create a delete button
+    let deleteButton = document.createElement('button');
+    deleteButton.innerText = 'Delete Enemy';
+    // give the button the corresponding class
+    deleteButton.className = 'deleteEnemyButton';
+    // add event listener to delete enemy when clicked
+    deleteButton.addEventListener('click', function(click) {
+        // remove the enemy from the encounter object
+        // assign a variable to the enemy's section
+        let thisEnemySection = click.target.parentElement.parentElement;
+        // calculate the index of the corresponding enemy in the encounter object (subtract 1 due to Add Enemy button)
+        let indexOfThisEnemy = Array.from(thisEnemySection.parentElement.children).indexOf(thisEnemySection) - 1;
+        // remove the enemy from the encounter object
+        encounter.removeEnemy(indexOfThisEnemy);
+        // delete the entire enemy section
+        thisEnemySection.remove();
     });
 
-    // append the button into the enemy dropdown section
-    newEnemyMenu.appendChild(statGenerationButton);
+    // append the button into the enemy
+    newEnemyMenu.appendChild(deleteButton);
+
+    // create a level dropdown
+    let levelLookup = document.createElement('select');
+    // append the level dropdown into the enemy dropdown section
+    newEnemyMenu.appendChild(levelLookup);
+    // create and append the corresponding options into the dropdown
+    for (let i = 0; i <= 25; i++) {
+        let levelOption = document.createElement('option');
+        levelOption.innerText = `Level ${i}`;
+        levelLookup.appendChild(levelOption);
+    };
+
+    // create a rank dropdown
+    let rankLookup = document.createElement('select');
+    // append the rank dropdown into the enemy dropdown section
+    newEnemyMenu.appendChild(rankLookup);
+    // create and append the corresponding options into the dropdown
+    let rankList = ['Minion', 'Grunt', 'Elite', 'Paragon (3)', 'Paragon (4)', 'Paragon (5)', 'Paragon (6)'];
+    for (let rank of rankList) {
+        let newRank = document.createElement('option');
+        newRank.innerText = rank;
+        rankLookup.appendChild(newRank);
+    };
+
+    // create a role dropdown
+    let roleLookup = document.createElement('select');
+    // append the role dropdown into the enemy dropdown section
+    newEnemyMenu.appendChild(roleLookup);
+    // create and append the corresponding options into the dropdown
+    let roleList = ['Controller', 'Defender', 'Lurker', 'Skirmisher', 'Striker', 'Supporter'];
+    for (let role of roleList) {
+        let newRole = document.createElement('option');
+        newRole.innerText = role;
+        roleLookup.appendChild(newRole);
+    };
+
+    // create a quantity dropdown
+    let quantityLookup = document.createElement('select');
+    // append the quantity dropdown into the enemy dropdown section
+    newEnemyMenu.appendChild(quantityLookup);
+    // create and append the corresponding options into the dropdown
+    for (let i = 1; i <= 16; i++) {
+        let quantityOption = document.createElement('option');
+        quantityOption.innerText = `Quantity: ${i}`;
+        quantityLookup.appendChild(quantityOption);
+    };
+
+    // add event listener to generate stats when dropdowns are changed
+    levelLookup.addEventListener('change', encounter.updateAndAppendStats);
+    rankLookup.addEventListener('change', encounter.updateAndAppendStats);
+    roleLookup.addEventListener('change', encounter.updateAndAppendStats);
+    quantityLookup.addEventListener('change', encounter.updateAndAppendStats);
 
     // append the enemy menu section into the enemy section
     newEnemy.appendChild(newEnemyMenu);
 
     // append the enemy section into the enemies section
     document.querySelector('.statGenerationSection').appendChild(newEnemy);
+
+    // trigger the event listener to force stat calculation and threat spent calculation
+    let forcedEvent = new Event('change');
+    levelLookup.dispatchEvent(forcedEvent);
 };
 
 // addAnEnemy() when button is clicked
 document.querySelector('.addEnemyButton').addEventListener('click', addAnEnemy);
-
-
 
 // create base stats object used by enemy constructors
 const baseStatsTable = new baseStats();
@@ -850,5 +847,10 @@ const baseStatsTable = new baseStats();
 // create encounter object to hold current enemies
 const encounter = new Encounter();
 
-// add event listener to Calculate Threat Budget Button
-document.querySelector('.threatButton').addEventListener('click', encounter.calculateThreatBudget);
+// add event listener to update threat budget when dropdowns change
+document.querySelector('.numberOfPCsDropdown').addEventListener('change', encounter.calculateThreatBudget);
+document.querySelector('.averagePCLevelDropdown').addEventListener('change', encounter.calculateThreatBudget);
+document.querySelector('.encounterDifficultyDropdown').addEventListener('change', encounter.calculateThreatBudget);
+
+// calculate threat budget when page loads in case dropdowns are saved
+encounter.calculateThreatBudget();

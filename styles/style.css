@@ -135,8 +135,7 @@ Encounter Section Layout
     align-self: center;
 }
 
-.encounterDropdownsSection h3,
-.threatButton {
+.encounterDropdownsSection h3 {
     padding: 5px;
 }
 
