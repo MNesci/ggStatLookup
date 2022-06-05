@@ -340,9 +340,7 @@ class baseStats {
             challengeRating: 17,
             XP: 18750,
         }
-
     };
-
 };
 
 
@@ -851,6 +849,10 @@ const encounter = new Encounter();
 document.querySelector('.numberOfPCsDropdown').addEventListener('change', encounter.calculateThreatBudget);
 document.querySelector('.averagePCLevelDropdown').addEventListener('change', encounter.calculateThreatBudget);
 document.querySelector('.encounterDifficultyDropdown').addEventListener('change', encounter.calculateThreatBudget);
+
+
+// calculate threat spent when average pc level dropdown changes
+document.querySelector('.averagePCLevelDropdown').addEventListener('change', () => encounter.calculateThreatSpent());
 
 // calculate threat budget when page loads in case dropdowns are saved
 encounter.calculateThreatBudget();
