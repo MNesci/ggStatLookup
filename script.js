@@ -856,3 +856,9 @@ document.querySelector('.averagePCLevelDropdown').addEventListener('change', () 
 
 // calculate threat budget when page loads in case dropdowns are saved
 encounter.calculateThreatBudget();
+
+// show/hide info toggle
+document.querySelector('.infoHeading').addEventListener('click', (event) => {
+    let paragraphs = Array.from(document.querySelectorAll('.infoParagraph'));
+    paragraphs.forEach((paragraph) => paragraph.classList.toggle('hiddenInfo'));
+});

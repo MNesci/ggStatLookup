@@ -107,9 +107,27 @@ Main Layout
 */
 
 main {
-    padding: 10px;
+    max-width: 1400px;
+    margin: auto;
 }
 
+
+/*
+Info Section Layout
+*/
+
+.infoSection {
+    margin-bottom: 50px;
+}
+
+.infoHeading {
+    text-align: left;
+}
+
+.hiddenInfo {
+    display: none;
+    visibility: hidden;
+}
 
 /*
 Encounter Section Layout
