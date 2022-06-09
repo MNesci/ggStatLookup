@@ -609,7 +609,7 @@ class Encounter {
         this.calculateThreatSpent();
     };
 
-    // removes placeholder or enemy object from encounter, and inserts enemy when generate is used
+    // removes placeholder or enemy object from encounter, and inserts enemy
     updateEnemy(indexOfEnemy, enemy) {
         this.enemies.splice(indexOfEnemy, 1, enemy);
         this.calculateThreatSpent();
@@ -620,12 +620,13 @@ class Encounter {
         let enemyNameSaved;
         let enemyNameText;
         // check if the enemy has already been generated
-        if (event.target.parentElement.parentElement.children.length > 1) {
+        let individualEnemySection = event.target.parentElement.parentElement;
+        if (individualEnemySection.children.length > 1) {
             // save the enemy's name
-            enemyNameText = event.target.parentElement.parentElement.children[1].children[0].children[1].value;
+            enemyNameText = individualEnemySection.children[1].children[0].children[1].value;
             enemyNameSaved = true;
             // delete its stat section before generating a new one
-            event.target.parentElement.parentElement.children[1].remove();
+            individualEnemySection.children[1].remove();
         };
 
         // create an array of the 3 dropdowns for the enemy
@@ -633,9 +634,9 @@ class Encounter {
         // assign a variable for the enemy's level
         let enemyLevel = Number(dropdownArray[0].value.replace('Level ', ''));
         // assign a variable for the enemy's rank
-        let enemyRank = dropdownArray[1].value;
+        let enemyRank = dropdownArray[1].value.replace('Rank: ', '');
         // assign a variable for the enemy's role
-        let enemyRole = dropdownArray[2].value;
+        let enemyRole = dropdownArray[2].value.replace('Role: ', '');
         // assign a variable for the enemy's quantity
         let enemyQuantity = Number(dropdownArray[3].value.replace('Quantity: ', ''));
 
@@ -792,7 +793,7 @@ function addAnEnemy() {
     let rankList = ['Minion', 'Grunt', 'Elite', 'Paragon (3)', 'Paragon (4)', 'Paragon (5)', 'Paragon (6)'];
     for (let rank of rankList) {
         let newRank = document.createElement('option');
-        newRank.innerText = rank;
+        newRank.innerText = `Rank: ${rank}`;
         rankLookup.appendChild(newRank);
     };
 
@@ -804,7 +805,7 @@ function addAnEnemy() {
     let roleList = ['Controller', 'Defender', 'Lurker', 'Skirmisher', 'Striker', 'Supporter'];
     for (let role of roleList) {
         let newRole = document.createElement('option');
-        newRole.innerText = role;
+        newRole.innerText = `Role: ${role}`;
         roleLookup.appendChild(newRole);
     };
 
@@ -836,14 +837,15 @@ function addAnEnemy() {
     levelLookup.dispatchEvent(forcedEvent);
 };
 
-// addAnEnemy() when button is clicked
-document.querySelector('.addEnemyButton').addEventListener('click', addAnEnemy);
 
 // create base stats object used by enemy constructors
 const baseStatsTable = new baseStats();
 
 // create encounter object to hold current enemies
 const encounter = new Encounter();
+
+// addAnEnemy() when button is clicked
+document.querySelector('.addEnemyButton').addEventListener('click', addAnEnemy);
 
 // add event listener to update threat budget when dropdowns change
 document.querySelector('.numberOfPCsDropdown').addEventListener('change', encounter.calculateThreatBudget);

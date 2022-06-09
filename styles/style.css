@@ -108,6 +108,8 @@ Main Layout
 
 main {
     max-width: 1400px;
+    padding-left: 20px;
+    padding-right: 20px;
     margin: auto;
 }
 
@@ -134,28 +136,38 @@ Encounter Section Layout
 */
 
 .encounterSection {
+    display: flex;
     margin-bottom: 20px;
 }
 
 .encounterDropdownsSection {
     display: flex;
+    justify-content: center;
     gap: 10px;
+    margin-bottom: 20px;
 }
 
-.dropdownContainer {
+.encounterDropdownContainer {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 }
 
-.threatBudgetSpan,
-.threatSpentSpan {
-    align-self: center;
-}
-
-.encounterDropdownsSection h3 {
+.encounterSection h3 {
     padding: 5px;
 }
+
+.encounterThreatSection {
+    display: flex;
+    justify-content: space-around;
+}
+
+.encounterThreatContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 
 
 /*
@@ -185,6 +197,7 @@ Enemy Stat Section Layout
 .enemyStatSection {
     display: flex;
     flex-wrap: wrap;
+    row-gap: 5px;
     margin-bottom: 10px;
 }
 
@@ -211,6 +224,13 @@ Enemy Stat Section Layout
 }
 
 
+/*
+Info Style
+*/
+
+a {
+    text-decoration: underline;
+}
 
 /*
 Encounter Section Style
@@ -219,7 +239,6 @@ Encounter Section Style
 .encounterSection * {
     font-size: 1.5rem;
 }
-
 
 /*
 Add Enemy Button Style
@@ -237,7 +256,6 @@ Enemy Lookup Section Style
 .enemyLookupSection * {
     font-size: 1.5rem;
 }
-
 
 /*
 Enemy Stat Section Style
@@ -258,3 +276,32 @@ Enemy Stat Section Style
     font-size: 1.4rem;
 }
 
+
+/*
+MEDIA QUERIES
+*/
+
+/* Enemy Lookup Stacks Vertically */
+@media (max-width: 680px) {
+
+    .enemyLookupSection {
+        flex-direction: column;
+    }
+}
+
+/* Encounter Threat Stacks Under Dropdowns */
+@media (max-width: 435px) {
+
+    .encounterSection {
+        flex-direction: column;
+    }
+
+    .encounterThreatSection {
+        justify-content: space-between;
+    }
+
+    .encounterThreatContainer {
+        flex-direction: row;
+        align-items: baseline;
+    }
+}
